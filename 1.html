@@ -1,0 +1,313 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+
+
+  <style>
+    @font-face {
+      font-family: 'NarkissBlock Thin';
+      src: url('f/NarkissBlock-Thin.2e32e7e75e878dae152e77b3a5801448.woff2') format('woff2'), url('f/NarkissBlock-Thin.040c65f16b0e7b7f9539ae99bb39cec7.woff') format('woff');
+    }
+
+    @font-face {
+      font-family: 'NarkissBlock Regular';
+      src: url('f/NarkissBlock-Regular.560f5692fe5f1a47901dd470956dba8b.woff2') format('woff2'), url('f/NarkissBlock-Regular.c723f2492febb4ce023174c5cf7077ed.woff') format('woff');
+    }
+
+    @font-face {
+      font-family: 'NarkissBlock Bold';
+      src: url('f/NarkissBlock-Bold.7cf52b8caa26c971fa3f31f894a4b604.woff2') format('woff2'), url('f/NarkissBlock-Bold.4e15a94a4612b3d8df8a3b9a5be4b293.woff') format('woff');
+    }
+
+    body {
+      margin: 0;
+    }
+
+    #c {
+      width: 100%;
+      /* let our container decide our size */
+      height: 100%;
+      display: block;
+    }
+
+    #container {
+      position: relative;
+      /* makes this the origin of its children */
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #labels {
+      position: absolute;
+      /* let us position ourself inside the container */
+      left: 0;
+      /* make our position the top left of the container */
+      top: 0;
+      color: #000;
+    }
+
+    #labels>div {
+      position: absolute;
+      /* let us position them inside the container */
+      left: 0;
+      /* make their default position the top left of the container */
+      top: 0;
+      font-size: 24px;
+      user-select: none;
+      /* don't let the text get selected */
+      background: #fff;
+      padding: 5px;
+    }
+
+    .font-r {
+      font-family: "NarkissBlock Regular";
+    }
+
+    .font-l {
+      font-family: "NarkissBlock Thin";
+    }
+
+    .font-h {
+      font-family: "NarkissBlock Bold";
+    }
+
+    .red-label {
+      color:#ff0000;
+    }
+  </style>
+
+</head>
+
+<body>
+
+
+  <div id="container">
+    <canvas id="c"></canvas>
+    <div id="labels">
+
+
+      <div id="foo1" class="font-h">Rothschild</div>
+      <div id="foo2" class="font-l">Design</div>
+      <div id="foo3" class="font-r">Award</div>
+      <div id="foo4" class="font-r red-label">פרס</div>
+      <div id="foo5" class="font-l red-label">העיצוב</div>
+      <div id="foo6" class="font-h red-label">רוטשילד</div>
+      <div id="foo7" class="font-h">جائزة</div>
+      <div id="foo8">تصميم</div>
+      <div id="foo9">روتشيلد</div>
+    </div>
+  </div>
+  <script src="three.min.js"></script>
+  <!-- <script src="https://threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script> -->
+  <script src="THREE.MeshLine.js"></script>
+
+
+
+  <script type="module">
+
+
+
+
+    var resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
+		var mouseX = 0, mouseY = 0;
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+
+    function main() {
+
+      const canvas = document.querySelector('#c');
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+      renderer.setClearColor(0xffffff, 0);
+      const fov = 75;
+      const aspect = 2;  // the canvas default
+      const near = 1.1;
+      const far = 20;
+      const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+      camera.position.z = 5;
+
+      // const controls = new THREE.OrbitControls(camera, canvas);
+      // controls.target.set(0, 0, 0);
+      // controls.update();
+
+      const scene = new THREE.Scene();
+
+      {
+        const color = 0xFFFFFF;
+        const intensity = 1;
+        const light = new THREE.DirectionalLight(color, intensity);
+        light.position.set(-1, 2, 4);
+        scene.add(light);
+      }
+
+      var vertices = [
+        new THREE.Vector3(0, 1.1, 1.5), // 0 - Eng-roth
+        new THREE.Vector3(0, 0, 0.2),// 1 - Eng-des
+        new THREE.Vector3(0, -1.2, -0.1),// 2 - Eng-aw
+        new THREE.Vector3(1, 1.5, .8),// 3 - Heb-aw
+        new THREE.Vector3(0.8, 0.4, 0.6),// 4 - Heb-aw
+        new THREE.Vector3(1, -1, 0.2),// 5 - Heb-aw
+        new THREE.Vector3(-1, 1.1, -.8),// 6 - ar-aw
+        new THREE.Vector3(-.7, -.3, -.7),// 7 - ar-aw
+        new THREE.Vector3(-1, -1, 0)// 8 - ar-aw
+      ];
+
+
+
+      makeLine(makeLineGeo([0, 1]), .2,false);
+      makeLine(makeLineGeo([1, 2]), .1,false);
+
+      makeLine(makeLineGeo([3, 4]), .1,true);
+      makeLine(makeLineGeo([4, 5]), .3,true);
+
+      makeLine(makeLineGeo([6, 7]), .2,false);
+      makeLine(makeLineGeo([7, 8]), .3,false);
+
+      makeLine(makeLineGeo([0, 3]), .3,false);
+      makeLine(makeLineGeo([0, 6]), .1,false);
+
+      makeLine(makeLineGeo([2, 5]), .2,false);
+      makeLine(makeLineGeo([2, 8]), .1,false);
+
+      function makeLineGeo(arr) {
+        let lineg = new Float32Array(arr.length * 3);
+
+        for (var i = 0; i < arr.length; i++) {
+
+          var currPoint = arr[i];
+          lineg[(i * 3)] = vertices[currPoint].x;
+          lineg[(i * 3) + 1] = vertices[currPoint].y;
+          lineg[(i * 3) + 2] = vertices[currPoint].z;
+
+        }
+        console.log(lineg);
+        return lineg;
+      }
+
+
+      function makeLine(geo, width,isColored) {
+
+        var g = new MeshLine();
+        g.setGeometry(geo);
+        var currColor = new THREE.Color(0x000000);
+        if (isColored) { currColor = new THREE.Color(0xff0000)}
+        var material = new MeshLineMaterial({
+          useMap: false,
+          color: currColor,
+          opacity: 1,
+          resolution: resolution,
+          sizeAttenuation: !false,
+          lineWidth: width / 10
+        });
+        var mesh = new THREE.Mesh(g.geometry, material);
+        scene.add(mesh);
+
+      }
+      const boxWidth = 0.1;
+      const boxHeight = 0.1;
+      const boxDepth = .1;
+      const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+
+      function makeInstance(geometry, v, name) {
+        const material = new THREE.MeshBasicMaterial({ opacity: 0 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+        cube.position.x = v.x;
+        cube.position.y = v.y;
+        cube.position.z = v.z;
+        const elem = document.querySelector('#foo' + name)
+        return { cube, elem };
+      }
+
+      const cubes = [
+        makeInstance(geometry, vertices[0], '1'),
+        makeInstance(geometry, vertices[1], '2'),
+        makeInstance(geometry, vertices[2], '3'),
+        makeInstance(geometry, vertices[3], '4'),
+        makeInstance(geometry, vertices[4], '5'),
+        makeInstance(geometry, vertices[5], '6'),
+        makeInstance(geometry, vertices[6], '7'),
+        makeInstance(geometry, vertices[7], '8'),
+        makeInstance(geometry, vertices[8], '9')
+      ];
+
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
+
+      const tempV = new THREE.Vector3();
+
+
+      var angle = 45;
+      var radius = 5;
+
+      function render(time) {
+
+
+        camera.position.x += (- (mouseX / windowHalfX) - camera.position.x) * 1;
+			camera.position.y += ((mouseY / windowHalfY) - camera.position.y) * 1;
+     
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+        if (resizeRendererToDisplaySize(renderer)) {
+          const canvas = renderer.domElement;
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
+        }
+
+        cubes.forEach((cubeInfo, ndx) => {
+          const { cube, elem } = cubeInfo;
+          cube.updateWorldMatrix(true, false);
+          cube.getWorldPosition(tempV);
+          tempV.project(camera);
+          const x = (tempV.x * .5 + .5) * canvas.clientWidth;
+          const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
+          elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+        });
+
+        // todo: rotate camera
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+      document.addEventListener('mousemove', onDocumentMouseMove, false);
+			window.addEventListener('resize', onWindowResize, false);
+    }
+
+
+    function onWindowResize() {
+			windowHalfX = window.innerWidth / 2;
+			windowHalfY = window.innerHeight / 2;
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+		function onDocumentMouseMove(event) {
+			mouseX = (event.clientX - windowHalfX) / 2;
+			mouseY = (event.clientY - windowHalfY) / 2;
+    }
+    
+
+    main();
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>
